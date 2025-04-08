@@ -38,7 +38,7 @@ jobs:
           MONGO_URI: ${{ secrets.MONGO_URI }}
         run: npm run start
 
-      - name: Send notification on success
+      - name: Send email notification on success
         if: success()
         uses: dawidd6/action-send-mail@v3
         with:
@@ -46,12 +46,12 @@ jobs:
           server_port: 587
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: Gamerverse Cron Job Success 🎉
+          subject: "Gamerverse Cron Job Success 🎉"
           to: your@email.com
           from: Gamerverse Cron Service
           body: "Cron job completed successfully!"
 
-      - name: Send notification on failure
+      - name: Send email notification on failure
         if: failure()
         uses: dawidd6/action-send-mail@v3
         with:
@@ -59,7 +59,21 @@ jobs:
           server_port: 587
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: Gamerverse Cron Job Failed ❌
+          subject: "Gamerverse Cron Job Failed ❌"
           to: your@email.com
           from: Gamerverse Cron Service
-          body:  "Uh oh! The cron job failed. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          body: "Uh oh! The cron job failed. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      - name: Discord notification on success
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
+          -d "{\"content\": \"✅ Gamerverse Cron Job **Success**! Workflow: ${{ github.workflow }}. See details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
+
+      - name: Discord notification on failure
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
+          -d "{\"content\": \"❌ Gamerverse Cron Job **Failed**! Workflow: ${{ github.workflow }}. Check logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"

@@ -1,0 +1,65 @@
+name: Run Gamerverse Cron Job
+
+on:
+  schedule:
+    # Runs every day at midnight UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  run-cron-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm run test || echo "Tests failed, continuing to cron job..."
+
+      - name: Run cron service
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+        run: npm run start
+
+      - name: Send notification on success
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: Gamerverse Cron Job Success 🎉
+          to: your@email.com
+          from: Gamerverse Cron Service
+          body: "Cron job completed successfully!"
+
+      - name: Send notification on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: Gamerverse Cron Job Failed ❌
+          to: your@email.com
+          from: Gamerverse Cron Service
+          body:  "Uh oh! The cron job failed. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"

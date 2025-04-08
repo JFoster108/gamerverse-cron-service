@@ -1,0 +1,36 @@
+{
+  "name": "gamerverse-cron-service",
+  "version": "1.0.0",
+  "description": "This is cron job logic for my Social networking app, Gamerverse.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JFoster108/gamerverse-cron-service.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JFoster108/gamerverse-cron-service/issues"
+  },
+  "homepage": "https://github.com/JFoster108/gamerverse-cron-service#readme",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "mongoose": "^8.13.2",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.0",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@types/node-cron": "^3.0.11",
+    "@types/nodemailer": "^6.4.17"
+  }
+}
